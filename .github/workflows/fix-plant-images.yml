@@ -1,0 +1,126 @@
+name: Fix plant image sets
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix DG001-DG005 image sets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          base = Path('drug')
+          special = 'https://commons.wikimedia.org/wiki/Special:FilePath/'
+
+          data = {
+            'DG001': {
+              'hero': [
+                'Centella_asiatica-1-yercaud-salem-India.JPG',
+                'Centella_asiatica_leaf.JPG_-_Photo_by_V_C_Balakrishnan.jpg',
+                'Centella_asiatica_flowerhead1_%288417485169%29.jpg',
+              ],
+              'labels': ['Whole plant / habit','Leaf','Flowerhead'],
+              'gallery_title': 'Field Identification Gallery',
+              'gallery': [
+                ('Centella_asiatica_flowerhead2_%288417486829%29.jpg','Flowerhead close-up'),
+                ('Centella-asiatica-seeds-ethnoplants.jpg','Seeds'),
+                ('CS_of_Centella_asiatica_stem.jpg','Stem / anatomical section'),
+                ('Centella_asiatica_habit.jpg','Natural growth habit'),
+              ],
+            },
+            'DG002': {
+              'hero': [
+                'Convolvulus_prostratus_kz01.jpg',
+                'Convolvulus_prostratus_kz02.jpg',
+                'Convolvulus_prostratus_kz03.jpg',
+              ],
+              'labels': ['Whole plant / habit','Leaves and stems','Flowers / diagnostic parts'],
+              'gallery_title': 'Field Identification Gallery',
+              'gallery': [
+                ('Evolvulus_pilosus.jpg','Flower, stems and leaves'),
+                ('Convolvulus_prostratus_kz02.jpg','Vegetative detail'),
+                ('Convolvulus_prostratus_kz03.jpg','Flowering / field detail'),
+              ],
+            },
+            'DG003': {
+              'hero': [
+                'Celastrus_paniculatus_%2812909831183%29.jpg',
+                'Celastrus_paniculatus_05.JPG',
+                'Celastrus_paniculatus_seeds.jpg',
+              ],
+              'labels': ['Whole plant / habit','Plant detail','Seeds'],
+              'gallery_title': 'Field Identification Gallery',
+              'gallery': [
+                ('Celastrus_paniculatus_leaves.jpg','Leaves'),
+                ('Celastrus_paniculatus_leaves1.jpg','Leaves — diagnostic view'),
+                ('Jyotishmati_%28Sanskrit-_%E0%A4%9C%E0%A5%8D%E0%A4%AF%E0%A5%8B%E0%A4%A4%E0%A4%BF%E0%A4%B7%E0%A4%AE%E0%A4%A4%E0%A4%BF%29_%282464533395%29.jpg','Whole plant / field view'),
+              ],
+            },
+            'DG004': {
+              'hero': [
+                'Benincasa_hispida-1-selvapuram-coimbatore-India.jpg',
+                'Benincasa_hispida-2-selvapuram-coimbatore-India.jpg',
+                'Benincasa_hispida_flower.jpg',
+              ],
+              'labels': ['Whole plant / vine','Fruit and vine','Flower'],
+              'gallery_title': 'Field Identification Gallery',
+              'gallery': [
+                ('Benincasa_hispida-3-selvapuram-coimbatore-India.jpg','Fruit / field specimen'),
+                ('Benincasa_hispida-anna_park-yercaud-salem-India.JPG','Waxy fruit'),
+                ('W_tougan4091.jpg','Mature fruit'),
+                ('Benincasa_Hispida_%282_grados_de_desarrollo_del_fruto%29.jpg','Fruit development'),
+              ],
+            },
+            'DG005': {
+              'hero': [
+                'Starr-100615-2828-Lavandula%20stoechas-flowering%20habit%20with%20sign-Alii%20Kula%20Lavender%20Farm%20Waipoli%20Rd-Maui%20%2825013687506%29.jpg',
+                'Lavandula%20stoechas%20%28flower%29.jpg',
+                'Lavandula-stoechas-flower-close.JPG',
+              ],
+              'labels': ['Whole plant / flowering habit','Flowers','Flower close-up'],
+              'gallery_title': 'Botanical Gallery',
+              'gallery': [
+                ('Starr-120613-9688-Lavandula%20stoechas-flower%20and%20leaves-Lowes%20Nursery%20Kahului-Maui%20%2825145558975%29.jpg','Flowers and leaves'),
+                ('Lavandula_stoechas.jpg','Whole plant'),
+                ('Lavandula%20Stoechas.%20Lavanda.jpg','Plant and foliage'),
+                ('Lavendula_stoechas.JPG','Field specimen'),
+              ],
+            },
+          }
+
+          def url(name):
+            return special + name
+
+          def gallery_html(items):
+            figs=[]
+            for name, caption in items:
+              figs.append(f'<figure class="photo"><img loading="lazy" src="{url(name)}" alt="{caption}"><figcaption>{caption}</figcaption></figure>')
+            return '<section class="section"><div class="st">__TITLE__</div><div class="gallery">' + ''.join(figs) + '</div></section>'
+
+          for dg, cfg in data.items():
+            p=base/dg/'index.html'
+            s=p.read_text(encoding='utf-8')
+            hero='<div class="hero">' + ''.join(f'<img src="{url(n)}" alt="{a}">' for n,a in zip(cfg['hero'],cfg['labels'])) + '</div>'
+            s=re.sub(r'<div class="hero">.*?</div>', hero, s, count=1, flags=re.S)
+            g=gallery_html(cfg['gallery']).replace('__TITLE__', cfg['gallery_title'])
+            s=re.sub(r'<section class="section">\s*<div class="st">(?:Field Identification Gallery|Botanical Gallery)</div>.*?</section>', g, s, count=1, flags=re.S)
+            p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit corrected image sets
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add drug/DG001/index.html drug/DG002/index.html drug/DG003/index.html drug/DG004/index.html drug/DG005/index.html .github/workflows/fix-plant-images.yml
+          git commit -m 'Fix duplicate plant images and expand botanical galleries' || exit 0
+          git rm .github/workflows/fix-plant-images.yml
+          git commit -m 'Remove temporary image-fix workflow'
+          git push
