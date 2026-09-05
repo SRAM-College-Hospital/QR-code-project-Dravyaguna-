@@ -1,0 +1,31 @@
+name: Fix DG001 Quick Facts Mobile Gap
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-dg001-quick-facts-mobile-gap.yml'
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch mobile Quick Facts spacing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('drug/DG001/index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '</style>\n</head>'
+          patch = '''<style id="dg001-quick-facts-mobile-gap">\n@media(max-width:480px){\n  .quick dl{grid-template-columns:125px minmax(0,1fr);column-gap:20px;row-gap:4px;margin-left:10px;margin-right:10px;font-size:13px}\n  .quick dt,.quick dd{white-space:nowrap;text-align:left}\n}\n</style>\n'''
+          if 'dg001-quick-facts-mobile-gap' not in s:
+              s = s.replace(marker, patch + marker, 1)
+              p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "SRAMCH"
+          git config user.email "ramakrishna.shanbhoge@gmail.com"
+          git add drug/DG001/index.html
+          git diff --cached --quiet || git commit -m "Fix DG001 Quick Facts mobile spacing"
+          git push
