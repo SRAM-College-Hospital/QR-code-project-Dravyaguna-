@@ -22,6 +22,18 @@
 .modal-card #modal-body{display:block;max-height:88vh;overflow-y:auto;overflow-x:hidden;padding:24px 22px 30px;-webkit-overflow-scrolling:touch}
 .modal-card #modal-body h2{margin:0 48px 18px 0}
 .modal-card #modal-body p,.modal-card #modal-body li{font-size:16px;line-height:1.55}
+</style><style id="dg001-mobile-rectification">/* DG001 MOBILE RECTIFICATION v4 */
+.header{height:92px;padding:7px 24px}
+.mark{width:62px;height:62px;transform:scale(.78);transform-origin:center}
+.identity{gap:10px}.identity h1{font-size:19px}.identity p{font-size:12px;margin-top:4px}.identity small{font-size:11px}
+.hero-image:after{left:22px;right:22px;max-width:calc(100% - 44px);white-space:normal;line-height:1.2}
+@media(max-width:800px){
+  .header{height:78px;padding:7px 14px;display:flex;align-items:center}.identity{gap:7px;width:100%}.mark{width:50px;height:50px;flex:0 0 50px;transform:scale(.64)}.identity h1{font-size:17px;line-height:1.02}.identity p{font-size:11px;line-height:1.12;margin-top:3px}.identity small{font-size:10px}
+  .hero-image{min-height:300px}.hero-image:after{left:16px;right:16px;max-width:calc(100% - 32px);font-size:19px;line-height:1.22}
+  .plant-info{padding:20px 16px 18px}.plant-info h2{font-size:34px;line-height:1.05;padding-right:78px}.sanskrit{font-size:27px;margin:6px 0 9px}.common{font-size:18px;line-height:1.3}.botanical{font-size:20px;margin:9px 0 14px}.fact,.property{font-size:13px;min-height:60px;padding:8px 6px}.fact b,.property b{font-size:14px}.icon{font-size:28px}.property .badge{width:25px;height:25px;font-size:13px;padding-top:4px}.intro{font-size:15px;line-height:1.4;padding:10px 12px}.medicinal{top:10px;right:10px;width:70px;height:70px;font-size:12px;line-height:1;transform:none;z-index:2}.medicinal:before{font-size:22px}
+  .modal{position:fixed!important;inset:0!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:8px!important;background:rgba(0,45,35,.72)!important}.modal[hidden]{display:none!important}.modal-card{position:relative!important;width:calc(100vw - 16px)!important;max-width:720px!important;max-height:calc(100vh - 16px)!important;height:auto!important;overflow:hidden!important;padding:0!important;border:3px solid #e4d77a!important;border-radius:14px!important;display:flex!important;flex-direction:column!important;background:#fffdf7!important}.modal-card #modal-body{display:block!important;flex:1 1 auto!important;min-height:0!important;max-height:calc(100vh - 22px)!important;overflow-y:auto!important;overflow-x:hidden!important;padding:20px 16px 26px!important;-webkit-overflow-scrolling:touch!important}.modal-card #modal-body h2{font-size:24px!important;line-height:1.15!important;margin:0 42px 14px 0!important}.modal-card #modal-body p,.modal-card #modal-body li{font-size:15px!important;line-height:1.5!important}.close{position:absolute!important;z-index:3!important;right:7px!important;top:7px!important;width:36px!important;height:36px!important;font-size:25px!important;line-height:36px!important;padding:0!important}
+}
+@media(max-width:480px){.hero-image{min-height:290px}.plant-info h2{font-size:32px;padding-right:76px}.common{font-size:17px}.botanical{font-size:19px}.facts3,.properties{gap:8px}.fact,.property{font-size:12.5px}.fact b,.property b{font-size:13.5px}}
 </style></head>
 <body><main class="page">
 <header class="header"><div class="identity"><div class="mark"><span></span><span></span><span></span></div><div><h1>Dravyaguna Digital<br>Botanical Garden</h1><p>SRAM College &amp; Hospital<br><small>Explore&nbsp; • &nbsp;Learn&nbsp; • &nbsp;Conserve</small></p></div></div><div class="motto">Ancient Wisdom<br>for a Healthier Tomorrow</div><div class="planet"><div class="qr" aria-label="QR code"></div><p>Plants<br>People<br>Planet</p></div></header>
@@ -56,5 +68,5 @@ document.querySelectorAll('[data-topic]').forEach(function(btn){
     },10);
   });
 });
-</script></body></html>
+</script><script id="dg001-popup-rectification">(function(){document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.side button,[data-topic]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();var m=document.getElementById('detail-modal'),body=document.getElementById('modal-body');if(!m||!body)return;var key=b.getAttribute('data-topic');try{var d=details[key];body.innerHTML='<h2 id="modal-title">'+d.title+'</h2>'+d.html}catch(err){body.innerHTML='<h2 id="modal-title">Mandukaparni</h2><p>Detailed monograph content is available in this section.</p>'}m.hidden=false;body.scrollTop=0;document.body.style.overflow='hidden'},true);document.addEventListener('click',function(e){if(e.target.id==='detail-modal'||(e.target.closest&&e.target.closest('.modal .close'))){var m=document.getElementById('detail-modal');if(m)m.hidden=true;document.body.style.overflow=''}});document.addEventListener('keydown',function(e){if(e.key==='Escape'){var m=document.getElementById('detail-modal');if(m)m.hidden=true;document.body.style.overflow=''}})})();</script></body></html>
 
