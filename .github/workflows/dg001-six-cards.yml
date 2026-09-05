@@ -1,0 +1,59 @@
+name: DG001 six-card rectification
+on:
+  push:
+    paths:
+      - TEMP-DG001-TRIGGER-2.txt
+permissions:
+  contents: write
+jobs:
+  rectify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rectify DG001 only
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('drug/DG001/index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove only the top site header; leave the footer untouched.
+          s, n = re.subn(r'<header class="header">.*?</header>', '', s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'Expected one header, removed {n}')
+
+          # Replace the sidebar/overview area with six equal topic cards.
+          cards = '''<section class="main topic-grid" aria-label="Mandukaparni topics">
+          <button class="topic-card" data-topic="overview"><span>◒</span><strong>Overview</strong><small>Identity, habitat and classical profile</small></button>
+          <button class="topic-card" data-topic="phyto"><span>♧</span><strong>Phytoconstituents</strong><small>Recorded constituents and plant chemistry</small></button>
+          <button class="topic-card" data-topic="uses"><span>♟</span><strong>Therapeutic Uses</strong><small>Traditional therapeutic applications</small></button>
+          <button class="topic-card" data-topic="dose"><span>♙</span><strong>Dose &amp; Administration</strong><small>Historical dosage units from the source</small></button>
+          <button class="topic-card" data-topic="formulations"><span>♧</span><strong>Formulations</strong><small>Classical preparations listed in the monograph</small></button>
+          <button class="topic-card" data-topic="references"><span>▣</span><strong>Classical References</strong><small>Ayurvedic textual references</small></button>
+          </section>'''
+          s, n = re.subn(r'<section class="main">.*?</section>\s*<footer class="footer">', cards + '\n<footer class="footer">', s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'Expected one main section before footer, replaced {n}')
+
+          css = '''<style id="dg001-six-card-rectification">
+          .topic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:16px 15px 20px;background:var(--cream)}
+          .topic-card{width:100%;min-height:112px;border:1px solid #c9d5bd;border-radius:14px;background:#f9f7ed;box-shadow:0 2px 5px #d7d1bf66;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 12px;color:#092c24;text-align:center;cursor:pointer;font-family:Georgia,'Times New Roman',serif;transition:transform .12s ease,box-shadow .12s ease,background .12s ease}
+          .topic-card span{font-size:27px;line-height:1;color:#267443}
+          .topic-card strong{font-size:17px;line-height:1.2}
+          .topic-card small{font-size:12px;line-height:1.25;color:#52645d;max-width:240px}
+          .topic-card:hover,.topic-card:focus{outline:2px solid #ddc95e;outline-offset:-2px;background:#fffdf7;box-shadow:0 4px 10px #cfc8b766;transform:translateY(-1px)}
+          @media(max-width:800px){.topic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 12px 16px}.topic-card{min-height:98px;padding:12px 8px}.topic-card span{font-size:24px}.topic-card strong{font-size:15px}.topic-card small{font-size:11px}}
+          @media(max-width:480px){.topic-grid{grid-template-columns:1fr;gap:9px;padding:10px 10px 14px}.topic-card{min-height:76px;display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;column-gap:6px;text-align:left;padding:10px 12px}.topic-card span{grid-row:1 / span 2;align-self:center;text-align:center}.topic-card strong{font-size:16px}.topic-card small{font-size:11px;max-width:none}}
+          </style>'''
+          s = s.replace('</head>', css + '</head>', 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+          rm -f TEMP-DG001-TRIGGER-2.txt .github/workflows/dg001-six-cards.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add drug/DG001/index.html TEMP-DG001-TRIGGER-2.txt .github/workflows/dg001-six-cards.yml
+          git commit -m "Rectify DG001 header and six topic cards"
+          git push
