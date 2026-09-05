@@ -1,0 +1,30 @@
+name: Fix DG001 Quick Facts
+on:
+  push:
+    paths:
+      - 'TEMP-DG001-QUICK-FACTS.txt'
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix Quick Facts rows
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('drug/DG001/index.html')
+          s=p.read_text(encoding='utf-8')
+          old='.quick dl{margin:8px 12px 12px;display:grid;grid-template-columns:126px 1fr;gap:4px;font-size:14px}'
+          new='.quick dl{margin:8px 12px 12px;display:grid;grid-template-columns:150px 1fr;gap:4px;font-size:14px}.quick dt,.quick dd{white-space:nowrap}'
+          if old not in s:
+              raise SystemExit('Quick Facts CSS pattern not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add drug/DG001/index.html
+          git commit -m 'Fix Quick Facts name rows'
+          git push
