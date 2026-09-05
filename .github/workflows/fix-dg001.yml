@@ -1,7 +1,5 @@
 name: DG001 mobile rectification
-on:
-  push:
-    branches: [main]
+on: [push]
 permissions:
   contents: write
 jobs:
@@ -9,38 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch DG001
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('drug/DG001/index.html')
-          s=p.read_text(encoding='utf-8')
-          marker='DG001 MOBILE RECTIFICATION v3'
-          if marker not in s:
-              css='''<style id="dg001-mobile-rectification">/* DG001 MOBILE RECTIFICATION v3 */
-.header{height:92px;padding:7px 24px}
-.mark{width:62px;height:62px;transform:scale(.78);transform-origin:center}
-.identity{gap:10px}.identity h1{font-size:19px}.identity p{font-size:12px;margin-top:4px}.identity small{font-size:11px}
-@media(max-width:800px){
-.header{height:78px;padding:7px 14px;display:flex;align-items:center}.identity{gap:7px;width:100%}.mark{width:50px;height:50px;flex:0 0 50px;transform:scale(.64)}.identity h1{font-size:17px;line-height:1.02}.identity p{font-size:11px;line-height:1.12;margin-top:3px}.identity small{font-size:10px}
-.hero-image{min-height:300px}.plant-info{padding:20px 16px 18px}.plant-info h2{font-size:34px;line-height:1.05;padding-right:78px}.sanskrit{font-size:27px;margin:6px 0 9px}.common{font-size:18px;line-height:1.3}.botanical{font-size:20px;margin:9px 0 14px}.fact,.property{font-size:13px;min-height:60px;padding:8px 6px}.fact b,.property b{font-size:14px}.icon{font-size:28px}.property .badge{width:25px;height:25px;font-size:13px;padding-top:4px}.intro{font-size:15px;line-height:1.4;padding:10px 12px}.medicinal{top:10px;right:10px;width:70px;height:70px;font-size:12px;line-height:1;transform:none;z-index:2}.medicinal:before{font-size:22px}
-.modal{position:fixed!important;inset:0!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:8px!important;background:rgba(0,45,35,.72)!important}.modal[hidden]{display:none!important}.modal-card{position:relative!important;width:calc(100vw - 16px)!important;max-width:720px!important;max-height:calc(100vh - 16px)!important;height:auto!important;overflow:hidden!important;padding:0!important;border:3px solid #e4d77a!important;border-radius:14px!important;display:flex!important;flex-direction:column!important;background:#fffdf7!important}.modal-card #modal-body{display:block!important;flex:1 1 auto!important;min-height:0!important;max-height:calc(100vh - 22px)!important;overflow-y:auto!important;overflow-x:hidden!important;padding:20px 16px 26px!important;-webkit-overflow-scrolling:touch!important}.modal-card #modal-body h2{font-size:24px!important;line-height:1.15!important;margin:0 42px 14px 0!important}.modal-card #modal-body p,.modal-card #modal-body li{font-size:15px!important;line-height:1.5!important}.close{position:absolute!important;z-index:3!important;right:7px!important;top:7px!important;width:36px!important;height:36px!important;font-size:25px!important;line-height:36px!important;padding:0!important}
-}
-@media(max-width:480px){.hero-image{min-height:290px}.plant-info h2{font-size:32px;padding-right:76px}.common{font-size:17px}.botanical{font-size:19px}.facts3,.properties{gap:8px}.fact,.property{font-size:12.5px}.fact b,.property b{font-size:13.5px}}
-</style>'''
-              s=s.replace('</head>',css+'</head>',1)
-              js='''<script id="dg001-popup-rectification">(function(){function fallback(k){var F={overview:['Overview','<p>Mandukaparni is described in the source monograph as a spreading herb found near water and in moist places throughout India and Sri Lanka.</p><ul><li>Drug ID: DG001</li><li>Family: Umbelliferae (Apiaceae)</li><li>Useful part: Panchanga</li></ul>'],morphology:['Morphology','<p>A creeping, spreading herb.</p><ul><li><b>Stem:</b> Roots, leaves, flowers and fruits arise at each node.</li><li><b>Leaves:</b> Alternate, kidney-shaped, about 1–2½ inches long and broad.</li><li><b>Flowers:</b> Small, bluish-white to reddish.</li><li><b>Fruit:</b> Small fruits in clusters.</li><li><b>Root:</b> Slender and thread-like.</li><li><b>Distribution:</b> India and Sri Lanka, especially moist places.</li></ul>'],properties:['Ayurvedic Properties','<ul><li><b>Rasa:</b> Tikta</li><li><b>Anurasa:</b> Kashaya–Madhura</li><li><b>Guna:</b> Laghu, Sara</li><li><b>Virya:</b> Shita</li><li><b>Vipaka:</b> Madhura</li><li><b>Prabhava:</b> Medhya</li></ul>'],uses:['Therapeutic Uses','<p>Traditional-use contexts include nervous, digestive, respiratory, urinary and skin disorders, and general debility.</p>'],phyto:['Phytoconstituents','<p>The source reports an alkaloidal constituent named “Brahmin”, volatile oil in leaves, and other constituents in dried leaves.</p>'],formulations:['Formulations','<p>Brahmi-paka, Brahmi-panaka, Saraswatarishta, Saraswata-ghrita, Brahmi-taila, Brahmi-sattva and Brahmi-malhara.</p>'],dose:['Dose and Administration','<p>Historical dosage units are retained from the source and are not modern prescribing instructions.</p><ul><li>Svarasa: 1–2 tola</li><li>Root powder: 3–12 ratti</li><li>Panchanga powder: 3–5 masha</li></ul>'],references:['Classical References','<ul><li><b>Sushruta Samhita, Sutra Sthana 46</b></li><li><b>Bhavaprakasha</b></li><li><b>Charaka Samhita, Chikitsa Sthana 2</b></li><li><b>Sushruta Samhita, Chikitsa Sthana 28</b></li></ul>'],research:['Research Insights','<p>The existing DG001 monograph does not present a dedicated research-findings section. No additional unverified conclusions are added here.</p>']};return F[k]||F.overview}function data(k){try{if(typeof details!=="undefined"&&details[k])return details[k]}catch(e){}return fallback(k)}function open(k){var m=document.getElementById("detail-modal"),b=document.getElementById("modal-body");if(!m||!b)return;var d=data(k),t=d.title||d[0],h=d.html||d[1];b.innerHTML="<h2 id=\"modal-title\">"+t+"</h2>"+h;m.hidden=false;m.setAttribute("aria-hidden","false");b.scrollTop=0;document.body.style.overflow="hidden"}function close(){var m=document.getElementById("detail-modal");if(m)m.hidden=true;document.body.style.overflow=""}document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".side button,[data-topic]");if(!b)return;e.preventDefault();e.stopImmediatePropagation();open(b.getAttribute("data-topic")||"overview")},true);document.addEventListener("click",function(e){if(e.target.id==="detail-modal"||(e.target.closest&&e.target.closest(".modal .close")))close()});document.addEventListener("keydown",function(e){if(e.key==="Escape")close()})})();</script>'''
-              s=s.replace('</body>',js+'</body>',1)
-              p.write_text(s,encoding='utf-8')
-          PY
-      - name: Commit patch and remove workflow
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add drug/DG001/index.html
-          git commit -m "Fix DG001 mobile layout and popups"
-          git rm .github/workflows/fix-dg001.yml
-          git commit -m "Remove temporary DG001 workflow"
-          git push
+      - run: echo "DG001 patch workflow started"
