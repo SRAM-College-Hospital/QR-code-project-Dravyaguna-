@@ -1,0 +1,65 @@
+name: DG001 correction
+on:
+  push:
+    paths:
+      - 'TEMP-DG001-TRIGGER.txt'
+      - '.github/workflows/tmp-dg001-correction.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch DG001
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('drug/DG001/index.html')
+          s=p.read_text(encoding='utf-8')
+          patch='''
+          <style id="dg001-final-correction">
+          /* Final DG001 mobile/desktop correction */
+          .header{height:58px!important;padding:4px 18px!important}
+          .identity{gap:8px!important;min-width:0!important}
+          .mark{width:52px!important;height:52px!important;flex:0 0 52px!important;transform:scale(.48)!important;transform-origin:center!important}
+          .identity h1{font-size:14px!important;line-height:.98!important;white-space:nowrap!important}
+          .identity p{font-size:9px!important;line-height:1.05!important;margin-top:2px!important}
+          .identity small{font-size:8px!important}
+          .id{display:none!important}
+          @media(max-width:800px){
+            .header{height:52px!important;padding:3px 10px!important;display:flex!important;align-items:center!important}
+            .identity{gap:5px!important;width:100%!important}
+            .mark{width:44px!important;height:44px!important;flex:0 0 44px!important;transform:scale(.43)!important}
+            .identity h1{font-size:12px!important;line-height:.95!important;white-space:nowrap!important}
+            .identity p{font-size:8px!important;line-height:1!important;margin-top:1px!important}
+            .identity small{font-size:7px!important}
+          }
+          </style>
+          '''
+          if 'id="dg001-final-correction"' not in s:
+              s=s.replace('</head>',patch+'</head>')
+          start=s.find('<script>\nconst details=')
+          if start==-1:
+              start=s.find('<script>const details=')
+          if start==-1:
+              raise SystemExit('popup script start not found')
+          end=s.find('</body>',start)
+          if end==-1:
+              raise SystemExit('body end not found')
+          first=s[start:end]
+          m=re.search(r'const details=(.*?);const modal=', first, re.S)
+          if not m:
+              raise SystemExit('details object not found')
+          details=m.group(1)
+          new_script='''<script id="dg001-popup-final">\nconst details='''+details+''';\n(function(){\n  var modal=document.getElementById('detail-modal');\n  var body=document.getElementById('modal-body');\n  var close=modal ? modal.querySelector('.close') : null;\n  if(!modal || !body) return;\n  function openDetail(btn){\n    var key=btn.getAttribute('data-topic');\n    var d=details[key];\n    if(!d) return;\n    body.innerHTML='<h2 id="modal-title">'+d.title+'</h2>'+d.html;\n    modal.hidden=false;\n    modal.style.display='flex';\n    document.body.style.overflow='hidden';\n    body.scrollTop=0;\n  }\n  function closeDetail(){\n    modal.hidden=true;\n    modal.style.display='none';\n    document.body.style.overflow='';\n  }\n  document.querySelectorAll('.side button[data-topic]').forEach(function(btn){\n    btn.onclick=function(e){e.preventDefault();openDetail(btn);return false;};\n  });\n  if(close) close.onclick=function(e){e.preventDefault();closeDetail();};\n  modal.onclick=function(e){if(e.target===modal) closeDetail();};\n  document.addEventListener('keydown',function(e){if(e.key==='Escape' && !modal.hidden) closeDetail();});\n})();\n</script>\n'''
+          s=s[:start]+new_script+s[end:]
+          p.write_text(s,encoding='utf-8')
+          PY
+          rm -f TEMP-DG001-TRIGGER.txt .github/workflows/tmp-dg001-correction.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add drug/DG001/index.html TEMP-DG001-TRIGGER.txt .github/workflows/tmp-dg001-correction.yml
+          git commit -m 'Rectify DG001 header, image label, and popup' || exit 0
+          git push
