@@ -1,0 +1,38 @@
+name: Fix DG001 Footer Compact
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-dg001-footer-compact.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compact footer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('drug/DG001/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = ".footer{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;min-height:126px;padding:20px 29px;"
+          new = ".footer{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;min-height:82px;padding:10px 18px;"
+          if old not in s:
+              raise SystemExit('Target footer CSS not found')
+          s = s.replace(old, new, 1)
+          s = s.replace('.footer p{margin:0;font-size:14px;line-height:1.35}', '.footer p{margin:0;font-size:12px;line-height:1.25}', 1)
+          s = s.replace('.footer b{font-size:16px}', '.footer b{font-size:14px}', 1)
+          s = s.replace('.footer .foot-motto{text-align:center;font:italic 18px/1.2 Georgia,serif}', '.footer .foot-motto{text-align:center;font:italic 14px/1.2 Georgia,serif}', 1)
+          s = s.replace('.footer .preserve{text-align:right;font:italic 18px/1.2 Georgia,serif}', '.footer .preserve{text-align:right;font:italic 14px/1.2 Georgia,serif}', 1)
+          s = s.replace('@media(max-width:800px){.header{height:auto;', '@media(max-width:800px){.footer{padding:9px 14px}.footer .foot-motto,.footer .preserve{margin-top:5px}.header{height:auto;', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit footer fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add drug/DG001/index.html
+          git commit -m 'Make DG001 footer compact'
+          git push
